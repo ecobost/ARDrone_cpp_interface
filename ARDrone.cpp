@@ -39,15 +39,17 @@ void ARDrone::takeoff(){
         at_trim();
         usleep(250000);
 
-        // Takes off (and waits 7.5 seconds until it stabilizes)
+        // Takes off (and waits 4.5 seconds until it stabilizes)
         at_ui_pad_start_pressed();
-        usleep(7500000);
+        usleep(4500000);
 
         // Resets communication
         at_comwdg();
         usleep(250000);
 
         isFlying = true;
+
+        stopAndHover();
     }
 }
 
