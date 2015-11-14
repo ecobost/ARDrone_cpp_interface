@@ -80,6 +80,13 @@ class ARDrone
         // Gets the percentage of remaining battery life (0-100)
         double getBatteryLife();
 
+        // Prints some useful statistics to the standard output
+        void printStats();
+
+        // Play video during seconds seconds. Framerate is 100 ms
+        // The drone stays put (on air or in the floor) while playing the video.
+        void playVideo(int seconds);
+
     protected:
     private:
         // Whether the drone is flying or not
@@ -99,3 +106,4 @@ class ARDrone
 };
 
 #endif // ARDRONE_H
+

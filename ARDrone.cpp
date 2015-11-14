@@ -9,6 +9,8 @@
 #include "control/app.h"
 #include <math.h>
 #include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <iostream>
 
 ARDrone::ARDrone(){
     // Connects with the drone and opens communication channels.
@@ -49,11 +51,9 @@ void ARDrone::takeoff(){
 
         isFlying = true;
 
-        // Hovers
+        // Hovers for 6 secs until takeoff stabilizes
         stopAndHover();
-
-        // Waits another 2 seconds for stabilization
-        usleep(3000000);
+        stopAndHover();
     }
 }
 
@@ -61,7 +61,7 @@ void ARDrone:: land(){
     // Lands the drone
     if (isFlying){
 
-        // Lands the drone
+        	// Lands the drone
 		at_ui_pad_start_pressed();
 		usleep(250000);
 
@@ -73,7 +73,7 @@ void ARDrone::moveUp(int cm){
     // Moves up (higher) cm centimeters.
 
     // Centimeters travelled by the drone in a single second. Needs to be adjusted for each drone and external conditions.
-    double distanceTravelledInOneSec = 32;
+    double distanceTravelledInOneSec = 32.7;
     double secondsNeeded = cm / distanceTravelledInOneSec;
 
     sendCommands(0, 0, speedUp, 0);
@@ -85,7 +85,7 @@ void ARDrone::moveDown(int cm){
     // Moves down (lower) cm centimeters
 
     // Centimeters travelled by the drone in a single second. Needs to be adjusted for each drone and external conditions.
-    double distanceTravelledInOneSec = 47.5;
+    double distanceTravelledInOneSec = 52.5;
     double secondsNeeded = cm / distanceTravelledInOneSec;
 
     sendCommands(0, 0, -speedDown, 0);
@@ -102,7 +102,7 @@ void ARDrone::moveAhead(int cm){
 
     // This function was calculated from a set of experiments with speedAhead = 0.15.
     // Needs to be adjusted for each drone and external conditions
-    double secondsNeeded = log2(cm/100) + 1.4;
+    double secondsNeeded = log2(cm/100) + 1.38;
 
     sendCommands(0, -speedAhead, 0, 0);
     usleep(secondsNeeded * 1000000);
@@ -171,7 +171,7 @@ cv::Mat ARDrone::getImage(){
     int channels = 3;
     int imageSize = imageWidth * imageHeight * channels;
 
-    // Note: Code from here on is taken from Tom Krajnik. It is bad and he should feel bad.
+    // Note: Code from here on is taken from Tom Krajnik: his code is bad and he should feel bad :)
     // I have tried to made it more readable but it is still quite ugly.
 
      // This array stores the image as a 24-bit RGB bitmap format.
@@ -242,4 +242,25 @@ int ARDrone::getAltitude(){
 double ARDrone::getBatteryLife(){
     // Gets the percentage of remaining battery life (0-100)
     return helidata.battery;
+}
+
+void ARDrone::printStats(){
+    // Prints some useful statistics to the standard output
+    std::cout << "Remaining battery life: " << getBatteryLife() << std::endl;
+    std::cout << "Altitude: " << getAltitude() << std::endl;
+    std::cout << "Pitch: " << getPitch() << std::endl;
+    std::cout << "Roll: " << getRoll() << std::endl;
+    std::cout << "Psi/Yaw: " << getYaw() << std::endl;
+}
+
+void ARDrone::playVideo(int seconds){
+    // Play video during seconds seconds. Framerate is 100.
+    cv::Mat image;
+    int framerate = 100;
+
+    for(int i = 1; i <= ( (seconds*1000) / framerate); i++){
+        image = getImage();
+        cv::imshow("Parrot Cam", image);
+        cv::waitKey(framerate);
+    }
 }

@@ -34,5 +34,5 @@ int main(){
     cv::imshow("Vertical", verticalImage);
     cv::waitKey(0);
 
-    std::cout << "Remaining battery life: " << myARDrone.getBatteryLife() << std::endl;
+    myARDrone.printStats();
 }
