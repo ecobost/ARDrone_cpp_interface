@@ -39,9 +39,9 @@ void ARDrone::takeoff(){
         at_trim();
         usleep(250000);
 
-        // Takes off (and waits 4.5 seconds until it stabilizes)
+        // Takes off
         at_ui_pad_start_pressed();
-        usleep(4500000);
+        usleep(250000);
 
         // Resets communication
         at_comwdg();
@@ -49,7 +49,11 @@ void ARDrone::takeoff(){
 
         isFlying = true;
 
+        // Hovers
         stopAndHover();
+
+        // Waits another 2 seconds for stabilization
+        usleep(3000000);
     }
 }
 
@@ -69,7 +73,7 @@ void ARDrone::moveUp(int cm){
     // Moves up (higher) cm centimeters.
 
     // Centimeters travelled by the drone in a single second. Needs to be adjusted for each drone and external conditions.
-    double distanceTravelledInOneSec = 28;
+    double distanceTravelledInOneSec = 32;
     double secondsNeeded = cm / distanceTravelledInOneSec;
 
     sendCommands(0, 0, speedUp, 0);
@@ -81,7 +85,7 @@ void ARDrone::moveDown(int cm){
     // Moves down (lower) cm centimeters
 
     // Centimeters travelled by the drone in a single second. Needs to be adjusted for each drone and external conditions.
-    double distanceTravelledInOneSec = 48;
+    double distanceTravelledInOneSec = 47.5;
     double secondsNeeded = cm / distanceTravelledInOneSec;
 
     sendCommands(0, 0, -speedDown, 0);
@@ -98,7 +102,7 @@ void ARDrone::moveAhead(int cm){
 
     // This function was calculated from a set of experiments with speedAhead = 0.15.
     // Needs to be adjusted for each drone and external conditions
-    double secondsNeeded = log2(cm/100) + 1.415;
+    double secondsNeeded = log2(cm/100) + 1.4;
 
     sendCommands(0, -speedAhead, 0, 0);
     usleep(secondsNeeded * 1000000);
@@ -109,7 +113,7 @@ void ARDrone::turnRight(){
     // Turns 90 degrees clockwise
 
     // The exact time needed to turn 90 degrees needs to be adjusted for each drone and external conditions.
-    double secondsToTurn90Degrees = 1.99;
+    double secondsToTurn90Degrees = 1.985;
 
     sendCommands(0, 0, 0, speedRight);
     usleep(secondsToTurn90Degrees * 1000000);
@@ -168,7 +172,7 @@ cv::Mat ARDrone::getImage(){
     int imageSize = imageWidth * imageHeight * channels;
 
     // Note: Code from here on is taken from Tom Krajnik. It is bad and he should feel bad.
-    // I have tried to reorganize it and make it more readable but it is still quite ugly.
+    // I have tried to made it more readable but it is still quite ugly.
 
      // This array stores the image as a 24-bit RGB bitmap format.
     unsigned char* rawImage = (unsigned char*) calloc(imageSize, sizeof(unsigned char));
@@ -239,4 +243,3 @@ double ARDrone::getBatteryLife(){
     // Gets the percentage of remaining battery life (0-100)
     return helidata.battery;
 }
-
